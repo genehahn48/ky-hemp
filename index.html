@@ -115,8 +115,8 @@
   <script>
     // create map options
     var options = {
-      center: [37.8393, -84.27], // center map on Kentucky
-      zoom: 4.4, //intial zoom to show State of Kentucky
+      center: [37.8, -85.8], // center map on Kentucky
+      zoom: 7.5, //intial zoom to show State of Kentucky
       zoomSnap: .1, // set coarseness of zoom
       zoomControl: false // set zoom control to off
     }
@@ -131,7 +131,7 @@
 
 
     // create variables to get data outside getJson() method
-    $.getJSON("data/ky_hemp_data.json", function(data) {
+    $.getJSON("data/ky_hemp.geojson", function(data) {
       console.log(data);
       var dataLayer = L.geoJson(data, {
         filter: function(layer) {
