@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset=utf-8 />
+  <title>Gene Hahn USA rental mean by County</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" />
+  <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #D5ECFE;
+      font-family: Lato, sans-serif;
+      color: #0D0000;
+    }
+
+    header {
+      width: 80%;
+      margin: 10px auto 10px auto;
+    }
+
+    h1 {
+      display: inline-block;
+      margin-right: 20px;
+      color: #113f66;
+      font-size: 2.5em;
+    }
+
+    h2 {
+      display: inline-block;
+      color: #113f66;
+      font-size: 1em;
+    }
+
+    #map {
+      width: 75%;
+      height: 540px;
+      margin: 10px 10%;
+      border: 1px solid #FE0101;
+      background-color: #D5ECFE;
+    }
+
+    footer {
+      padding: 6px 10%;
+      width: 80%;
+    }
+
+    p {
+      font-size: 1em;
+      color: #001323;
+    }
+
+    .legend {
+      padding: 6px 8px;
+      font-size: 1em;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+      border-radius: 5px;
+    }
+
+    .legend h3 {
+      font-size: 1.1em;
+      font-weight: normal;
+      color: #001323;
+      margin: 0 0 10px 0;
+    }
+
+    .legend span {
+      width: 20px;
+      height: 20px;
+      float: left;
+      margin: 0 10px 4px 0;
+    }
+
+    .legend label {
+      font-size: 1.1em;
+    }
+
+    .legend label:after {
+      content: '';
+      display: block;
+      clear: both;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Mean Rental Prices</h1>
+    <h2>per County</h2>
+  </header>
+
+  <div id='map'></div>
+
+  <footer>
+    <p>Map authored by Gene Hahn</p>
+    <p>Meta information:</p>
+    <p>Data from <a href="https://factfinder.census.gov/faces/nav/jsf/pages/index.xhtml">American FactFinder</a> and County polygons downloaded from
+      <a href="https://www.census.gov/geo/maps-data/data/cbf/cbf_counties.html">US Census</a>. Any counties that had null values were removed from data. The State boundary files was created with GeoJson file from <a href="http://eric.clst.org/tech/usgeojson/">Eric TECH</a>      website that has US Census data already converted to GeoJson file format. </p>
+  </footer>
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/simple-statistics@6.1.0/dist/simple-statistics.min.js"></script>
+
+  <script>
+    // create map options
+    var options = {
+      center: [38.39, -96.06], // center map on USA
+      zoom: 4.4, //intial zoom to show whole Contiguous USA
+      zoomSnap: .1, // set coarseness of zoom
+      zoomControl: false // set zoom control to off
+    }
+    var map = L.map('map', options);
+
+    // add global variables to access Name of counties and average Rent price
+    var countyName = "NAME",
+      rentValue = "RENT";
+    // empty array to hold all our values
+    var values = [];
+
+
+
+    // create variables to get data outside getJson() method
+    $.when($.getJSON("data/counties_median_rent_2015.json"), $.getJSON("data/us_states_boundries.json"))
+      .done(function(data, boundry) {
+
+      var dataLayer = L.geoJson(data, {
+        filter: function(layer) {
+          // console.log(layer.properties.RENT);
+          if (layer.properties.RENT == null) {
+            // console.log(layer.properties.RENT);
+          } else {
+            return layer
+          }
+        },
+        style: function(feature) {
+          return {
+            color: '#D5ECFE',
+            weight: .4,
+            fillOpacity: 1
+          }
+        },
+        onEachFeature: function(feature, layer) { // add bindTooltip to each county
+          // bind tooltip info to each layer with name of feature
+          var tooltip = '<b>County: </b> ' + layer.feature.properties[countyName] +
+            '<br> <b>Mean Rent: $</b>' + layer.feature.properties[rentValue]; // add popup info to map
+          layer.bindTooltip(tooltip);
+        }
+      }).addTo(map);
+
+      // call to new function here gets the data out of the
+      // callback function
+      drawMap(dataLayer);
+      // add State boundry to map
+      var stateBoundry = L.geoJson(boundry, {
+        style: function(feature) {
+          return {
+            color: '#FFFFFF',
+            weight: 2,
+            fill: false
+          };
+        }
+      }).addTo(map);
+    });
+    // }) // end getJSON
+
+
+    function drawMap(dataLayer) {
+      var breaks = getClassBreaks(dataLayer); // create variables to generate class breaks
+
+      drawLegend(breaks);
+
+      dataLayer.eachLayer(function(layer) {
+        var props = layer.feature.properties;
+        layer.setStyle({
+          fillColor: getColor(props[rentValue], breaks)
+        });
+
+      });
+    }
+
+    function getClassBreaks(dataLayer) { //getClassBreaks function start
+      // create empty Array for storing values
+      var values = [];
+
+      // loop through all the counties
+      dataLayer.eachLayer(function(layer) {
+        var props = layer.feature.properties;
+        var value = props[rentValue];
+        // console.log(props[countyName]);
+        // console.log(value);
+        values.push(+value);
+      });
+      // determine similar clusters
+      // console.log(values);
+      var clusters = ss.ckmeans(values, 6);
+      // create an array of the lowest value within each cluster
+      var breaks = clusters.map(function(cluster) {
+        return [cluster[0], cluster.pop()];
+
+      });
+      return breaks; // return Array of class breaks
+    } // end getClassBreaks function
+
+    function getColor(d, breaks) {
+      if (d <= breaks[0][1]) {
+        return '#ffffcc';
+      } else if (d <= breaks[1][1]) {
+        return '#c7e9b4';
+      } else if (d <= breaks[2][1]) {
+        return '#7fcdbb';
+      } else if (d <= breaks[3][1]) {
+        return '#41b6c4';
+      } else if (d <= breaks[4][1]) {
+        return '#2c7fb8';
+      } else if (d <= breaks[5][1]) {
+        return '#253494';
+      }
+    } // end getColor
+    function drawLegend(breaks) {
+      // create the Leaflet control and position
+      var legend = L.control({
+        position: 'bottomright'
+      });
+      // when it's added to the map
+      legend.onAdd = function() {
+        // create a new DOM div element with a class name of "legend"
+        var div = L.DomUtil.create('div', 'legend');
+        // insert some placeholder text for now
+        div.innerHTML = "<h3><b>Average Rental Price</b></h3>";
+        // return the div element
+        for (var i = 0; i < breaks.length; i++) {
+          var color = getColor(breaks[i][0], breaks);
+          div.innerHTML +=
+            '<span style="background:' + color + '"></span> ' +
+            '<label> $' + (breaks[i][0] * 1).toLocaleString() + ' &mdash; $' +
+            (breaks[i][1] * 1).toLocaleString() + '</label>';
+        }
+        return div;
+      }; // end legend
+      // add the legend to the map
+      legend.addTo(map);
+    }
+    map.addControl(L.control.zoom({ // add zoom control back to map
+      position: 'topright'
+    }));
+  </script>
+
+</body>
+
+</html>
