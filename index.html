@@ -197,8 +197,8 @@
       var mapChange = L.map('mapChange', options);
       // add global variables to access Name of counties and average Rent price
       var hemp1850 = "ky_HEMP_1850_TOTAL";
-      // var hemp1900 = [];
-      // var hemp1910 = [];
+      var hemp1900 = "ky_HEMP_1900_TOTAL";
+      var hemp1910 = "ky_HEMP_1910_TOTAL";
 
       // empty array to hold all our values
       var values = [];
@@ -206,7 +206,7 @@
       // create variables to get data outside getJson() method
       $.getJSON("data/ky_hemp.geojson", function(data) {
         // console.log(data);
-        var dataHemp = L.geoJson(data, {
+        var dataHemp1850 = L.geoJson(data, {
             filter: function(layer) {
               // if (layer.properties.ky_HEMP_1850_TOTAL > '0') {
               //   console.log(layer.properties.ky_HEMP_1850_TOTAL);
@@ -231,16 +231,42 @@
               layer.bindTooltip(tooltip);
             }
           }).addTo(map)
-          .addTo(map1900)
-          .addTo(map1910)
-          .addTo(mapChange);
+
+          var dataHemp1900 = L.geoJson(data, {
+            filter: function(layer) {
+              // if (layer.properties.ky_HEMP_1850_TOTAL > '0') {
+              //   console.log(layer.properties.ky_HEMP_1850_TOTAL);
+              // console.log(layer.properties.ky_HEMP_1900_TOTAL);
+              // console.log(layer.properties.ky_HEMP_1910_TOTAL);
+              // console.log(layer);
+              return layer
+              // }
+            },
+            style: function(feature) {
+              return {
+                color: '#000000',
+                weight: .4,
+                fill: '#098743',
+
+              }
+            },
+            onEachFeature: function(feature, layer) { // add bindTooltip to each county
+              // bind tooltip info to each layer with name
+              var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
+                '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1900]; // add popup info to map
+              layer.bindTooltip(tooltip);
+            }
+
+          }).addTo(map1900);
+          // .addTo(map1910)
+          // .addTo(mapChange);
 
         // call to new function here gets the data out of the
 
-        draw1850(dataHemp);
+        draw1850(dataHemp1850);
         // callback function
 
-        dataHemp.eachLayer(function(layer) {
+        dataHemp1850.eachLayer(function(layer) {
           // shorthand reference to properties
           var props = layer.feature.properties
           // calculate the normalized value
