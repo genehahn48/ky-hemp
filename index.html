@@ -191,7 +191,7 @@
         zoomControl: false // set zoom control to off
       }
       // map variable to display in grid 2x2
-      var map = L.map('map1850', options);
+      var map1850 = L.map('map1850', options);
       var map1900 = L.map('map1900', options);
       var map1910 = L.map('map1910', options);
       var mapChange = L.map('mapChange', options);
@@ -207,21 +207,11 @@
       $.getJSON("data/ky_hemp.geojson", function(data) {
         // console.log(data);
         var dataHemp1850 = L.geoJson(data, {
-            filter: function(layer) {
-              // if (layer.properties.ky_HEMP_1850_TOTAL > '0') {
-              //   console.log(layer.properties.ky_HEMP_1850_TOTAL);
-              // console.log(layer.properties.ky_HEMP_1900_TOTAL);
-              // console.log(layer.properties.ky_HEMP_1910_TOTAL);
-              // console.log(layer);
-              return layer
-              // }
-            },
             style: function(feature) {
               return {
                 color: '#000000',
                 weight: .4,
-                fill: '#098743',
-
+                stroke: '#098743',
               }
             },
             onEachFeature: function(feature, layer) { // add bindTooltip to each county
@@ -230,55 +220,36 @@
                 '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1850]; // add popup info to map
               layer.bindTooltip(tooltip);
             }
-          }).addTo(map)
+          }).addTo(map1850)
 
-          var dataHemp1900 = L.geoJson(data, {
-            filter: function(layer) {
-              // if (layer.properties.ky_HEMP_1850_TOTAL > '0') {
-              //   console.log(layer.properties.ky_HEMP_1850_TOTAL);
-              // console.log(layer.properties.ky_HEMP_1900_TOTAL);
-              // console.log(layer.properties.ky_HEMP_1910_TOTAL);
-              // console.log(layer);
-              return layer
-              // }
-            },
-            style: function(feature) {
-              return {
-                color: '#000000',
-                weight: .4,
-                fill: '#098743',
+          // var dataHemp1900 = L.geoJson(data, {
+          //   style: function(feature) {
+          //     return {
+          //       color: '#000000',
+          //       weight: .4,
+          //       fill: '#098743',
 
-              }
-            },
-            onEachFeature: function(feature, layer) { // add bindTooltip to each county
-              // bind tooltip info to each layer with name
-              var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
-                '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1900]; // add popup info to map
-              layer.bindTooltip(tooltip);
-            }
+          //     }
+          //   },
+          //   onEachFeature: function(feature, layer) { // add bindTooltip to each county
+          //     // bind tooltip info to each layer with name
+          //     var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
+          //       '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1900]; // add popup info to map
+          //     layer.bindTooltip(tooltip);
+          //   }
 
-          }).addTo(map1900);
+          // }).addTo(map1900);
           // .addTo(map1910)
           // .addTo(mapChange);
 
         // call to new function here gets the data out of the
 
         draw1850(dataHemp1850);
-        // callback function
 
-        dataHemp1850.eachLayer(function(layer) {
-          // shorthand reference to properties
-          var props = layer.feature.properties
-          // calculate the normalized value
-          var value = props[hemp1850];
-          // push that value to the array
-          // console.log(value);
-          values.push(value);
-
-        });
       }); // end getJSON
       //
       function draw1850(dataHemp) {
+        
         var breaks = getClassBreaks(dataHemp); // create variables to generate class breaks
 
         drawLegend1850(breaks);
@@ -299,8 +270,8 @@
         // loop through all the counties
         dataHemp.eachLayer(function(layer) {
           var props = layer.feature.properties;
-          var value = props[hemp1850];
-          if (props[hemp1850] > '0') {
+          var value = props[hemp1850]/((props['SHAPE_area'] / .0001) / 10000);
+          if (props[hemp1850] > 0) {
             // console.log(props[hemp1850]);
             // console.log(value);
             values.push(+value);
@@ -314,9 +285,11 @@
         // create an array of the lowest value within each cluster
         // console.log(clusters);
         var breaks = clusters.map(function(cluster) {
+
           return [cluster[0], cluster.pop()];
 
         });
+        console.log(breaks)
         // console.log(breaks);
         return breaks; // return Array of class breaks
       } // end getClassBreaks function
@@ -335,6 +308,7 @@
           return '#980043';
         }
       } // end getColor
+      
       function drawLegend1850(breaks) {
         // create the Leaflet control and position
         var legend = L.control({
@@ -357,9 +331,9 @@
           return div;
         }; // end legend
         // add the legend to the map
-        legend.addTo(map);
+        legend.addTo(map1850);
       }
-      map.addControl(L.control.zoom({ // add zoom control back to map
+      map1850.addControl(L.control.zoom({ // add zoom control back to map
         position: 'topright'
 
       }));
