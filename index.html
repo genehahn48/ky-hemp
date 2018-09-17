@@ -24,6 +24,17 @@
         /* margin: 10px auto 10px auto; */
       }
 
+      section {
+        margin: 0 auto;
+        padding: 6px 0;
+        width: 90%;
+      }
+
+      p {
+        font-size: 1em;
+        color: #001323;
+      }
+
       h1 {
         color: #7AB01C;
         font-size: 2.5em;
@@ -49,10 +60,17 @@
 
       /* Create two equal columns that floats next to each other */
 
+      .row {
+        margin-bottom: 15px;
+      }
+
       .column {
         float: left;
-        width: 50%;
-        padding: 10px;
+        width: 48%;
+      }
+
+      .col-left {
+        margin-right: 4%
       }
 
       /* Clear floats after the columns */
@@ -63,50 +81,27 @@
         clear: both;
       }
 
-      #map {
-        width: 45%;
+      #map1850 {
         height: 250px;
-        margin: 5px 5%;
-        background: #D1E6CB;
         border: 2px solid #D1E6CB;
         opacity: 1;
       }
 
       #map1900 {
-        width: 45%;
         height: 250px;
-        margin: 5px 5%;
-        border: 1px solid #FE0101;
-        background-color: #618A19;
+
       }
 
       #map1910 {
-        width: 45%;
-        height: 250px;
-        margin: 5px 5%;
-        border: 1px solid #FE0101;
-        background-color: #618A19;
+        height: 250px;;
       }
 
       #mapChange {
-        width: 45%;
-
         height: 250px;
-
-        margin: 5px 5%;
-
-        border: 1px solid #FE0101;
-        background-color: #618A19;
       }
 
       footer {
-        padding: 6px 10%;
-        width: 80%;
-      }
 
-      p {
-        font-size: 1em;
-        color: #001323;
       }
 
       .legend {
@@ -140,6 +135,7 @@
         display: block;
         clear: both;
       }
+
     </style>
   </head>
 
@@ -149,24 +145,28 @@
       <h2>by County in Kentucky</h2>
       <h3>1850's, 1900's, and 1910's USDA Ag Census data</h3>
     </header>
-
-    <!-- <div id='map'>1850's Census </div> -->
-    <div class="row" id='map'>
-      <div class="column" <h3>1850's Census</h3>
+    <section>
+      <div class="row">
+        <div class="column col-left">
+          <div id='map1850'>
+              <h3>1850's Census</h3>
+          </div>
+        </div>
+        <div class="column">
+          <div id='map1900'>
+              <h3>1900's Census</h3>
+          </div>
+        </div>
       </div>
-      <div class="column" id='map1900'>
-        <h3>1900's Census</h3>
+      <div class="row">
+        <div class="column col-left" id='map1910'>
+          <h3>1910's Census</h3>
+        </div>
+        <div class="column" id='mapChange'>
+          <h3>60 yrs change</h3>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="column" id='map1910'>
-        <h3>1910's Census</h3>
-      </div>
-      <div class="column" id='mapChange'>
-        <h3>60 yrs change</h3>
-      </div>
-    </div>
-
+    </section>
     <section>
       <footer>
         <p>Map authored by Gene Hahn</p>
@@ -191,7 +191,7 @@
         zoomControl: false // set zoom control to off
       }
       // map variable to display in grid 2x2
-      var map = L.map('map', options);
+      var map = L.map('map1850', options);
       var map1900 = L.map('map1900', options);
       var map1910 = L.map('map1910', options);
       var mapChange = L.map('mapChange', options);
