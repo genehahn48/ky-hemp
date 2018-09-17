@@ -150,7 +150,7 @@
       <h3>1850's, 1900's, and 1910's USDA Ag Census data</h3>
     </header>
 
-    <!-- <div id='map'>1850's Census </div> -->
+
     <div class="row" id='map'>
       <div class="column" <h3>1850's Census</h3>
       </div>
@@ -188,14 +188,14 @@
         center: [37.8, -85.8], // center map on Kentucky
         zoom: 6.4, //intial zoom to show State of Kentucky
         zoomSnap: .1, // set coarseness of zoom
-        zoomControl: false // set zoom control to off
+        zoomControl: true // set zoom control to off
       }
       // map variable to display in grid 2x2
       var map = L.map('map', options);
       var map1900 = L.map('map1900', options);
       var map1910 = L.map('map1910', options);
       var mapChange = L.map('mapChange', options);
-      // add global variables to access Name of counties and average Rent price
+      // add global variables
       var hemp1850 = "ky_HEMP_1850_TOTAL";
       // var hemp1900 = [];
       // var hemp1910 = [];
@@ -230,7 +230,7 @@
                 '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1850]; // add popup info to map
               layer.bindTooltip(tooltip);
             }
-          }).addTo(map)
+          }) //.addTo(map)
           .addTo(map1900)
           .addTo(map1910)
           .addTo(mapChange);
