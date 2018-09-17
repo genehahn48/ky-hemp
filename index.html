@@ -43,80 +43,59 @@
       text-align: center;
     }
 
-    /* body,
-    html {
-      padding: 0px;
-      margin: 30px;
-      height: 100%;
-    }
-
-    .box {
+    * {
       box-sizing: border-box;
-      margin: 0px;
+    }
+
+    /* Create two equal columns that floats next to each other */
+    .column {
       float: left;
-      width: 45%;
-      height: 45%;
+      width: 50%;
       padding: 10px;
-    } */
-
-    /* This is one way of adding borders,
-       if you *always* know that you have exactly 4 cells
-       aligned like this */
-
-    /*
-    .box:first-child {
-      border-bottom: 1px solid red;
-      border-right: 1px solid red;
     }
 
-    .box:nth-child(2) {
-      border-bottom: 1px solid red;
+    /* Clear floats after the columns */
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
     }
-
-    .box:nth-child(3) {
-      border-right: 1px solid red;
-    } */
 
     #map {
-      width: 80%;
-      height: 540px;
-      margin: 10px 10%;
-      background: whitesmoke;
-      border: 2px solid #dddedf;
+      width: 45%;
+      height: 250px;
+      margin: 5px 5%;
+      background: #D1E6CB;
+      border: 2px solid #D1E6CB;
+      opacity: 1;
     }
 
-    /* #map1900 {
-      width: 45%; */
-
-    /* height: 250px; */
-
-    /* margin: 5px 5%;*/
-
-    /* border: 1px solid #FE0101;
+    #map1900 {
+      width: 45%;
+      height: 250px;
+      margin: 5px 5%;
+      border: 1px solid #FE0101;
       background-color: #618A19;
-    } */
+    }
 
-    /* #map1910 {
-      width: 45%; */
-
-    /* height: 250px; */
-
-    /* margin: 5px 5%;*/
-
-    /* border: 1px solid #FE0101;
+    #map1910 {
+      width: 45%;
+      height: 250px;
+      margin: 5px 5%;
+      border: 1px solid #FE0101;
       background-color: #618A19;
     }
 
     #mapChange {
-      width: 45%; */
+      width: 45%;
 
-    /* height: 250px; */
+      height: 250px;
 
-    /* margin: 5px 5%;*/
+      margin: 5px 5%;
 
-    /* border: 1px solid #FE0101;
+      border: 1px solid #FE0101;
       background-color: #618A19;
-    }  */
+    }
 
     footer {
       padding: 6px 10%;
@@ -169,20 +148,34 @@
     <h3>1850's, 1900's, and 1910's USDA Ag Census data</h3>
   </header>
 
-  <div id='map'> </div>
-
-  <!-- <div class="box" id=map1900>1900's Census</div>
-  <div class="box" id=map1910>1910's census 3</div>
-  <div class="box" id=mapChange>Percent of change in 60 years </div> -->
+  <!-- <div id='map'>1850's Census </div> -->
+  <div class="row" id='map'>
+    <div class="column" <h3>1850's Census</h3>
+    </div>
+    <div class="column" id='map1900'>
+      <h3>1900's Census</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="column" id='map1910'>
+      <h3>1910's Census</h3>
+    </div>
+    <div class="column" id='mapChange'>
+      <h3>60 yrs change</h3>
+    </div>
+  </div>
 
   <section>
     <footer>
       <p>Map authored by Gene Hahn</p>
       <p>Meta information:</p>
       <p>Census data from <a href="https://www.agcensus.usda.gov/">USDA Census of Agriculture</a> and County polygons downloaded from
-        <a href="https://tigerweb.geo.census.gov/tigerwebmain/Files/tab10/tigerweb_tab10_county_2010_ky.html">US Census </a>2010 State of Kentucky counties. The GeoJson file was created with QGIS and joining CSV file created in Excel 2007 with hemp census
-        data. The data from the 1910 Census report had blurred scanned page so four counties are missing data or incomplete data. The effected counties are Lee, Lincoin, Madison, and Magoffin. Also the County boundries have changed over the decades and
-        may not represent the boundries that existed at the time of the Census becuase 2010 boundary data used to create maps. Please visit <a href="https://publications.newberry.org/ahcbp/pages/Kentucky.html">Atlas of Historical County Boundaries</a>        for changes in County boundaries. </p>
+        <a href="https://tigerweb.geo.census.gov/tigerwebmain/Files/tab10/tigerweb_tab10_county_2010_ky.html">US Census </a>2010 State of Kentucky counties. The GeoJson file was created with QGIS and joining CSV file created in Excel 2007 with hemp
+        census
+        data. The data from the 1910 Census report had blurred scanned page so four counties are missing data or incomplete data. The effected counties are Lee, Lincoin, Madison, and Magoffin. Also the County boundries have changed over the decades
+        and
+        may not represent the boundries that existed at the time of the Census becuase 2010 boundary data used to create maps. Please visit <a href="https://publications.newberry.org/ahcbp/pages/Kentucky.html">Atlas of Historical County Boundaries</a>
+        for changes in County boundaries. </p>
     </footer>
   </section>
 
@@ -200,9 +193,9 @@
     }
     // map variable to display in grid 2x2
     var map = L.map('map', options);
-    // var map1900 = L.map('map1900', options);
-    // var map1910 = L.map('map1910', options);
-    // var mapChange = L.map('mapChange', options);
+    var map1900 = L.map('map1900', options);
+    var map1910 = L.map('map1910', options);
+    var mapChange = L.map('mapChange', options);
     // add global variables to access Name of counties and average Rent price
     var hemp1850 = "ky_HEMP_1850_TOTAL";
     // var hemp1900 = [];
@@ -216,32 +209,38 @@
       // console.log(data);
       var dataHemp = L.geoJson(data, {
         filter: function(layer) {
-          // console.log(layer.properties.ky_HEMP_1850_TOTAL);
+          // if (layer.properties.ky_HEMP_1850_TOTAL > '0') {
+          //   console.log(layer.properties.ky_HEMP_1850_TOTAL);
           // console.log(layer.properties.ky_HEMP_1900_TOTAL);
           // console.log(layer.properties.ky_HEMP_1910_TOTAL);
+          // console.log(layer);
           return layer
+          // }
         },
         style: function(feature) {
           return {
             color: '#000000',
             weight: .4,
-            fill: '#098743'
+            fill: '#098743',
+
           }
+        },
+        onEachFeature: function(feature, layer) { // add bindTooltip to each county
+          // bind tooltip info to each layer with name
+          var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
+            '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1850]; // add popup info to map
+          layer.bindTooltip(tooltip);
         }
-        // onEachFeature: function(feature, layer) // add bindTooltip to each county
-        //   // bind tooltip info to each layer with name of feature
-        //   var tooltip = '<b>County: </b> ' + layer.feature.properties[countyName] +
-        //     '<br> <b>Mean Rent: $</b>' + layer.feature.properties[rentValue]; // add popup info to map
-        //   layer.bindTooltip(tooltip);
-        // }
-      }).addTo(map);
+      }).addTo(map)
       // .addTo(map1900)
       // .addTo(map1910)
       // .addTo(mapChange);
 
       // call to new function here gets the data out of the
-      // callback function
+
       draw1850(dataHemp);
+      // callback function
+
       dataHemp.eachLayer(function(layer) {
         // shorthand reference to properties
         var props = layer.feature.properties
@@ -276,12 +275,15 @@
       dataHemp.eachLayer(function(layer) {
         var props = layer.feature.properties;
         var value = props[hemp1850];
-        // console.log(props[hemp1850]);
-        // console.log(value);
-        values.push(+value);
+        if (props[hemp1850] > '0') {
+          // console.log(props[hemp1850]);
+          // console.log(value);
+          values.push(+value);
+        }
       });
       // determine similar clusters
       // console.log(values);
+
 
       var clusters = ss.ckmeans(values, 5);
       // create an array of the lowest value within each cluster
@@ -290,10 +292,12 @@
         return [cluster[0], cluster.pop()];
 
       });
+      // console.log(breaks);
       return breaks; // return Array of class breaks
     } // end getClassBreaks function
 
     function getColor(d, breaks) {
+      // console.log(d);
       if (d <= breaks[0][1]) {
         return '#f1eef6';
       } else if (d <= breaks[1][1]) {
@@ -322,7 +326,7 @@
           var color = getColor(breaks[i][0], breaks);
           div.innerHTML +=
             '<span style="background:' + color + '"></span> ' +
-            '<label> ' + (breaks[i][0] * 1).toLocaleString() + ' &mdash; ' +
+            '<label> ' + (breaks[i][0]).toLocaleString() + ' &mdash; ' +
             (breaks[i][1]).toLocaleString() + '</label>';
         }
         return div;
