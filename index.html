@@ -76,7 +76,6 @@
     }
 
     /* Clear floats after the columns */
-
     .row:after {
       content: "";
       display: table;
@@ -213,13 +212,11 @@
     var hemp1850 = "ky_HEMP_1850_TOTAL";
     var hemp1900 = "ky_HEMP_1900_TOTAL";
     var hemp1910 = "ky_HEMP_1910_TOTAL";
-
     // empty array to hold all our values
     var values1850 = [];
     var values1900 = [];
     var values1910 = [];
     var valuesChange = [];
-
     // create variables to get data outside getJson() method
     $.getJSON("data/ky_hemp.geojson", function(data) { // map 1850 start
       var dataHemp1850 = L.geoJson(data, { // Leaflet map load data
@@ -237,7 +234,6 @@
           layer.bindTooltip(tooltip);
         }
       }).addTo(map1850);
-
       var dataHemp1900 = L.geoJson(data, { // Leaflet map load data 1900 map
         style: function(feature) {
           return {
@@ -256,7 +252,6 @@
           layer.bindTooltip(tooltip);
         }
       }).addTo(map1900); //1900 map
-
       var dataHemp1910 = L.geoJson(data, { // Leaflet map load data 1910 map
         style: function(feature) {
           return {
@@ -275,10 +270,8 @@
           layer.bindTooltip(tooltip);
         }
       }).addTo(map1910); //1910 map
-
       // call to new function here gets the data out of the
       draw1850(dataHemp1850); // callback function
-
       dataHemp1850.eachLayer(function(layer, breaks1850) {
         // shorthand reference to properties
         var props = layer.feature.properties
@@ -290,7 +283,6 @@
         values1850.push(value1850); // push that value to the array
       });
       draw1900(dataHemp1900); // callback function
-
       dataHemp1900.eachLayer(function(layer, breaks1900) {
         // shorthand reference to properties
         var props = layer.feature.properties
@@ -302,7 +294,6 @@
         values1900.push(value1900); // push that value to the array
       });
       draw1910(dataHemp1910); // callback function
-
       dataHemp1910.eachLayer(function(layer, breaks1910) {
         // shorthand reference to properties
         var props = layer.feature.properties
@@ -314,7 +305,6 @@
         values1910.push(value1910); // push that value to the array
       });
     }); // end getJSON
-
     function draw1850(dataHemp1850) { // start draw1850 map
       var breaks1850 = getClassBreaks1850(dataHemp1850); // create variables to generate class breaks
       drawLegend1850(breaks1850); // legend 1850
@@ -330,7 +320,6 @@
     function getClassBreaks1850(dataHemp1850) { //getClassBreaks function start
       // create empty Array for storing values
       var values1850 = [];
-
       // loop through all the counties for 1850 data
       dataHemp1850.eachLayer(function(layer) {
         var props = layer.feature.properties;
@@ -343,11 +332,9 @@
       // create an array of the lowest value within each cluster
       var breaks1850 = clusters1850.map(function(cluster1850) {
         return [cluster1850[0], cluster1850.pop()];
-
       });
       return breaks1850; // return Array of class breaks
     } // end getClassBreaks function
-
     function getColor1850(d, breaks1850) {
       // console.log(d);
       // if (d <= breaks1850[0][1]) {
@@ -388,9 +375,7 @@
     }
     map1850.addControl(L.control.zoom({ // add zoom control back to map
       position: 'topright'
-
     })); //end 1850 map
-
     //*************************************************
     function draw1900(dataHemp1900) { // start draw1900 map
       var breaks1900 = getClassBreaks1900(dataHemp1900); // create variables to generate class breaks
@@ -407,7 +392,6 @@
     function getClassBreaks1900(dataHemp1900) { //getClassBreaks function start
       // create empty Array for storing values
       var values1900 = [];
-
       // loop through all the counties for 1900 data
       dataHemp1900.eachLayer(function(layer) {
         var props = layer.feature.properties;
@@ -422,12 +406,9 @@
       // create an array of the lowest value within each cluster
       var breaks1900 = clusters1900.map(function(cluster1900) {
         return [cluster1900[0], cluster1900.pop()];
-
       });
       return breaks1900; // return Array of class breaks
     } // end getClassBreaks function
-
-
     function getColor1900(d, breaks1900) {
       // console.log(breaks1900);
       // if (d <= breaks1900[0][1]) {
@@ -468,15 +449,11 @@
     }
     map1900.addControl(L.control.zoom({ // add zoom control back to map
       position: 'topright'
-
     })); //end 1900 map
-
     //*************************************************
     function draw1910(dataHemp1910) { // start draw1910 map
       var breaks1910 = getClassBreaks1910(dataHemp1910); // create variables to generate class breaks
-
       drawLegend1910(breaks1910); // legend 1910
-
       dataHemp1910.eachLayer(function(layer) { // loop layer to set legend color
         var props = layer.feature.properties;
         layer.setStyle({
@@ -489,7 +466,6 @@
     function getClassBreaks1910(dataHemp1910) { //getClassBreaks function start
       // create empty Array for storing values
       var values1910 = [];
-
       // loop through all the counties for 1910 data
       dataHemp1910.eachLayer(function(layer) {
         var props = layer.feature.properties;
@@ -505,12 +481,9 @@
       // create an array of the lowest value within each cluster
       var breaks1910 = clusters1910.map(function(cluster1910) {
         return [cluster1910[0], cluster1910.pop()];
-
       });
       return breaks1910; // return Array of class breaks
     } // end getClassBreaks function
-
-
     function getColor1910(d, breaks1910) {
       // console.log(breaks1910);
       if (d <= breaks1910[0][1]) {
@@ -523,7 +496,7 @@
         return '#dd1c77';
       } else if (d <= breaks1910[4][1]) {
         return '#980043';
-      }
+      } // need to comment out colors to move on
     } // end getColor
     function drawLegend1910(breaks1910) {
       // create the Leaflet control and position
@@ -551,7 +524,6 @@
     }
     map1910.addControl(L.control.zoom({ // add zoom control back to map
       position: 'topright'
-
     })); //end 1910 map
   </script>
 
