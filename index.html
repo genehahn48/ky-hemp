@@ -301,6 +301,18 @@
         var value1900 = props[hemp1900];
         values1900.push(value1900); // push that value to the array
       });
+      draw1910(dataHemp1910); // callback function
+
+      dataHemp1910.eachLayer(function(layer, breaks1910) {
+        // shorthand reference to properties
+        var props = layer.feature.properties
+        // calculate the normalized value
+        layer.setStyle({
+          fillColor: getColor1910(props[hemp1910], breaks1910)
+        });
+        var value1910 = props[hemp1910];
+        values1910.push(value1910); // push that value to the array
+      });
     }); // end getJSON
 
     function draw1850(dataHemp1850) { // start draw1850 map
@@ -462,7 +474,9 @@
     //*************************************************
     function draw1910(dataHemp1910) { // start draw1910 map
       var breaks1910 = getClassBreaks1910(dataHemp1910); // create variables to generate class breaks
+
       drawLegend1910(breaks1910); // legend 1910
+
       dataHemp1910.eachLayer(function(layer) { // loop layer to set legend color
         var props = layer.feature.properties;
         layer.setStyle({
@@ -479,9 +493,10 @@
       // loop through all the counties for 1910 data
       dataHemp1910.eachLayer(function(layer) {
         var props = layer.feature.properties;
+        console.log(props);
         if (props.ky_HEMP_1910_AC != 0) {
           var value1910 = Math.round((props.ky_HEMP_1910_LBS / props.ky_HEMP_1910_AC));
-          // console.log(value1910);
+          console.log(value1910);
           values1910.push(value1910);
         }
       });
