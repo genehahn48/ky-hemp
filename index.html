@@ -1,541 +1,406 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <meta charset=utf-8 />
-  <title>Historical Hemp Production in Kentucky</title>
-  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <head>
+    <meta charset=utf-8 />
+    <title>Historical Hemp Production in Kentucky</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" />
-  <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #D1E6CB;
-      font-family: Lato, sans-serif;
-      color: black;
-      width: 100%;
-    }
-
-    header {
-      width: 100%;
-      /* margin: 10px auto 10px auto; */
-    }
-
-    section {
-      margin: 0 auto;
-      padding: 6px 0;
-      width: 90%;
-    }
-
-    p {
-      font-size: 1em;
-      color: #001323;
-    }
-
-    h1 {
-      color: #7AB01C;
-      font-size: 2.5em;
-      text-align: center;
-    }
-
-    h2 {
-      color: #618A19;
-      font-size: 1.3em;
-      text-align: center;
-      vertical-align: text-top;
-    }
-
-    h3 {
-      color: #3F6202;
-      font-size: 1.1em;
-      text-align: center;
-    }
-
-    footer {}
-
-    /* Create two equal columns that floats next to each other */
-    * {
-      box-sizing: border-box;
-    }
-
-    .row {
-      margin-bottom: 15px;
-    }
-
-    .column {
-      float: left;
-      width: 48%;
-      /* padding: 10px; */
-    }
-
-    .col-left {
-      margin-right: 4%
-    }
-
-    /* Clear floats after the columns */
-    .row:after {
-      content: "";
-      display: table;
-      clear: both;
-    }
-
-    #map1850 {
-      height: 250px;
-      border: 1px solid #FE0101;
-      background-color: #618A19;
-      opacity: 1;
-    }
-
-    #map1900 {
-      height: 250px;
-      border: 1px solid #FE0101;
-      background-color: #618A19;
-    }
-
-    #map1910 {
-      height: 250px;
-      border: 1px solid #FE0101;
-      background-color: #618A19;
-    }
-
-    #mapChange {
-      height: 250px;
-      border: 1px solid #FE0101;
-      background-color: #618A19;
-    }
-
-    .legend {
-      padding: 3px 3px;
-      font-size: .8em;
-      background: rgba(255, 255, 255, 1);
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
-      border-radius: 2px;
-    }
-
-    .legend h3 {
-      font-size: .9em;
-      font-weight: normal;
-      color: #001323;
-      margin: 0 0 5px 0;
-    }
-
-    .legend span {
-      width: 15px;
-      height: 15px;
-      float: left;
-      margin: 0 5px 2px 0;
-    }
-
-    .legend label {
-      font-size: .85em;
-    }
-
-    .legend label:after {
-      content: '';
-      display: block;
-      clear: both;
-    }
-  </style>
-</head>
-
-<body>
-  <header>
-    <h1>Historical Hemp Production </h1>
-    <h2>by County in Kentucky</h2>
-    <h3>1850's, 1900's, and 1910's USDA Ag Census data</h3>
-  </header>
-  <section>
-    <div class="row">
-      <div class="column col-left">
-        <div id='map1850'>
-          <h3>1850's Census</h3>
-        </div>
-      </div>
-      <div class="column">
-        <div id='map1900'>
-          <h3>1900's Census</h3>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="column col-left" id='map1910'>
-        <h3>1910's Census</h3>
-      </div>
-      <div class="column" id='mapChange'>
-        <h3>60 yrs change</h3>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <footer>
-      <p>Map authored by Gene Hahn</p>
-      <p>Meta information:</p>
-      <p>Census data from <a href="https://www.agcensus.usda.gov/">USDA Census of Agriculture</a> and County polygons downloaded from
-        <a href="https://tigerweb.geo.census.gov/tigerwebmain/Files/tab10/tigerweb_tab10_county_2010_ky.html">US Census </a>2010 State of Kentucky counties. The GeoJson file was created with QGIS and joining CSV file created in Excel 2007 with hemp
-        census data. The data from the 1910 Census report had blurred scanned page so four counties are missing data or incomplete data. The effected counties are Lee, Lincoin, Madison, and Magoffin. Also the County boundries have changed over the
-        decades
-        and may not represent the boundries that existed at the time of the Census becuase 2010 boundary data used to create maps. Please visit <a href="https://publications.newberry.org/ahcbp/pages/Kentucky.html">Atlas of Historical County Boundaries</a>
-        for changes in County boundaries. </p>
-    </footer>
-  </section>
-
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/simple-statistics@6.1.0/dist/simple-statistics.min.js"></script>
-
-  <script>
-    // create map options
-    var options = {
-      center: [37.8, -85.8], // center map on Kentucky
-      zoom: 6.4, //intial zoom to show State of Kentucky
-      zoomSnap: .1, // set coarseness of zoom
-      zoomControl: false // set zoom control to off
-    }
-    // map variable to display in grid 2x2
-    var map1850 = L.map('map1850', options);
-    var map1900 = L.map('map1900', options);
-    var map1910 = L.map('map1910', options);
-    var mapChange = L.map('mapChange', options);
-    // add global variables
-    var hemp1850 = "ky_HEMP_1850_TOTAL";
-    var hemp1900 = "ky_HEMP_1900_TOTAL";
-    var hemp1910 = "ky_HEMP_1910_TOTAL";
-    // empty array to hold all our values
-    var values1850 = [];
-    var values1900 = [];
-    var values1910 = [];
-    var valuesChange = [];
-    // create variables to get data outside getJson() method
-    $.getJSON("data/ky_hemp.geojson", function(data) { // map 1850 start
-      var dataHemp1850 = L.geoJson(data, { // Leaflet map load data
-        style: function(feature) {
-          return {
-            color: '#000000',
-            weight: .4,
-            // fillColor: getColor1850(feature.properties[hemp1850], breaks1850),
-            fillOpacity: 1
-          }
-        },
-        onEachFeature: function(feature, layer) { // add bindTooltip to each county
-          // bind tooltip info to each layer with name
-          var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
-            '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1850]; // add popup info to map
-          layer.bindTooltip(tooltip);
-        }
-      }).addTo(map1850);
-      draw1850(dataHemp1850);
-      console.log(dataHemp1850);
-
-      var dataHemp1900 = L.geoJson(data, { // Leaflet map load data 1900 map
-        style: function(feature) {
-          return {
-            color: '#000000',
-            weight: .4,
-            fillOpacity: 1
-          }
-        },
-        onEachFeature: function(feature, layer) { // add bindTooltip to each county
-          var props = layer.feature.properties;
-          // bind tooltip info to each layer with name
-          var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
-            '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1900] +
-            '<br> <b>Pounds: </b>' + props.ky_HEMP_1900_LBS; // add popup info to map
-          layer.bindTooltip(tooltip);
-        }
-      }).addTo(map1900); //1900 map
-      draw1900(values1900);
-      console.log(values1900);
-
-      var dataHemp1910 = L.geoJson(data, { // Leaflet map load data 1910 map
-        style: function(feature) {
-          return {
-            color: '#000000',
-            weight: .4,
-            fillOpacity: 1
-          }
-        },
-        onEachFeature: function(feature, layer) { // add bindTooltip to each county
-          var props = layer.feature.properties;
-          // bind tooltip info to each layer with name
-          var tooltip = '<b>County: </b> ' + props.NAME +
-            '<br> <b>Tonnage: </b>' + props[hemp1910] +
-            '<br> <b>Pounds: </b>' + props.ky_HEMP_1910_LBS +
-            '<br> <b>Value: $</b>' + props.ky_HEMP_1910_VALUE; // add popup info to map
-          layer.bindTooltip(tooltip);
-        }
-      }).addTo(map1910); //1910 map
-
-      // call to new function here gets the data out of the
-
-      dataHemp1850.eachLayer(function(layer, breaks1850) {
-        // shorthand reference to properties
-        var props = layer.feature.properties
-        // calculate the normalized value
-        layer.setStyle({
-          fillColor: getColor1850(props[hemp1850], breaks1850)
-        });
-        var value1850 = props[hemp1850];
-        values1850.push(value1850); // push that value to the array
-      });
-
-      // draw1900(dataHemp1900); // callback function
-
-      dataHemp1900.eachLayer(function(layer, breaks1900) {
-        // shorthand reference to properties
-        var props = layer.feature.properties
-        // calculate the normalized value
-        layer.setStyle({
-          fillColor: getColor1900(props[hemp1900], breaks1900)
-        });
-        var value1900 = props[hemp1900];
-        values1900.push(value1900); // push that value to the array
-      });
-
-      draw1910(dataHemp1910); // callback function
-      dataHemp1910.eachLayer(function(layer, breaks1910) {
-        // shorthand reference to properties
-        var props = layer.feature.properties
-        // calculate the normalized value
-        layer.setStyle({
-          fillColor: getColor1910(props[hemp1910], breaks1910)
-        });
-        var value1910 = props[hemp1910];
-        values1910.push(value1910); // push that value to the array
-      });
-    }); // end getJSON
-
-    function draw1850(dataHemp1850) { // start draw1850 map
-      var breaks1850 = getClassBreaks1850(dataHemp1850); // create variables to generate class breaks
-      drawLegend1850(breaks1850); // legend 1850
-      dataHemp1850.eachLayer(function(layer) { // loop layer to set legend color
-        var props = layer.feature.properties;
-        layer.setStyle({
-          fillColor: getColor1850(props[hemp1850],
-            breaks1850)
-        });
-      });
-    }
-
-    function getClassBreaks1850(dataHemp1850) { //getClassBreaks function start
-      // create empty Array for storing values
-      var values1850 = [];
-      // loop through all the counties for 1850 data
-      dataHemp1850.eachLayer(function(layer) {
-        var props = layer.feature.properties;
-        var value = props[hemp1850];
-        // console.log(value);
-        values1850.push(+value);
-      });
-      // determine similar clusters
-      var clusters1850 = ss.ckmeans(values1850, 5);
-      // create an array of the lowest value within each cluster
-      var breaks1850 = clusters1850.map(function(cluster1850) {
-        return [cluster1850[0], cluster1850.pop()];
-      });
-      return breaks1850; // return Array of class breaks
-    } // end getClassBreaks function
-    function getColor1850(d, breaks1850) {
-      // console.log(d);
-      if (d <= breaks1850[0][1]) {
-        return '#f1eef6';
-      } else if (d <= breaks1850[1][1]) {
-        return '#d7b5d8';
-      } else if (d <= breaks1850[2][1]) {
-        return '#df65b0';
-      } else if (d <= breaks1850[3][1]) {
-        return '#dd1c77';
-      } else if (d <= breaks1850[4][1]) {
-        return '#980043';
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #D1E6CB;
+        font-family: Lato, sans-serif;
+        color: black;
+        width: 100%;
       }
-    } // end getColor
 
-    function drawLegend1850(breaks1850) {
-      // create the Leaflet control and position
-      var legend1850 = L.control({
+      header {
+        width: 100%;
+        /* margin: 10px auto 10px auto; */
+      }
+
+      section {
+        margin: 0 auto;
+        padding: 6px 0;
+        width: 90%;
+      }
+
+      p {
+        font-size: 1em;
+        color: #001323;
+      }
+
+      h1 {
+        color: #7AB01C;
+        font-size: 2.5em;
+        text-align: center;
+      }
+
+      h2 {
+        color: #618A19;
+        font-size: 1.3em;
+        text-align: center;
+        vertical-align: text-top;
+      }
+
+      h3 {
+        color: #3F6202;
+        font-size: 1.1em;
+        text-align: center;
+      }
+
+      footer {}
+
+      /* Create two equal columns that floats next to each other */
+
+      * {
+        box-sizing: border-box;
+      }
+
+      .row {
+        margin-bottom: 15px;
+      }
+
+      .column {
+        float: left;
+        width: 48%;
+        /* padding: 10px; */
+      }
+
+      .col-left {
+        margin-right: 4%
+      }
+
+      /* Clear floats after the columns */
+
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+
+      #map1850 {
+        /* width: 45%; */
+        height: 250px;
+        /* margin: 5px 5%; */
+        /* background: #D1E6CB; */
+        border: 2px solid #D1E6CB;
+        opacity: 1;
+      }
+
+      #map1900 {
+        /* width: 45%; */
+        height: 250px;
+        /* margin: 5px 5%; */
+        /* border: 1px solid #FE0101; */
+        /* background-color: #618A19; */
+      }
+
+      #map1910 {
+        /* width: 45%; */
+        height: 250px;
+        /* margin: 5px 5%; */
+        /* border: 1px solid #FE0101; */
+        /* background-color: #618A19; */
+      }
+
+      #mapChange {
+        /* width: 45%; */
+        height: 250px;
+        /* margin: 5px 5%; */
+        /* border: 1px solid #FE0101; */
+        /* background-color: #618A19; */
+      }
+
+      .legend {
+        padding: 3px 3px;
+        font-size: .8em;
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
+        border-radius: 2px;
+      }
+
+      .legend h3 {
+        font-size: .9em;
+        font-weight: normal;
+        color: #001323;
+        margin: 0 0 5px 0;
+      }
+
+      .legend span {
+        width: 15px;
+        height: 15px;
+        float: left;
+        margin: 0 5px 2px 0;
+      }
+
+      .legend label {
+        font-size: .85em;
+      }
+
+      .legend label:after {
+        content: '';
+        display: block;
+        clear: both;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>Historical Hemp Production </h1>
+      <h2>by County in Kentucky</h2>
+      <h3>1850's, 1900's, and 1910's USDA Ag Census data</h3>
+    </header>
+    <section>
+      <div class="row">
+        <div class="column col-left">
+          <div id='map1850'>
+            <h3>1850's Census</h3>
+          </div>
+        </div>
+        <div class="column">
+          <div id='map1900'>
+            <h3>1900's Census</h3>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="column col-left" id='map1910'>
+          <h3>1910's Census</h3>
+        </div>
+        <div class="column" id='mapChange'>
+          <h3>60 yrs change</h3>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <footer>
+        <p>Map authored by Gene Hahn</p>
+        <p>Meta information:</p>
+        <p>Census data from <a href="https://www.agcensus.usda.gov/">USDA Census of Agriculture</a> and County polygons downloaded from
+          <a href="https://tigerweb.geo.census.gov/tigerwebmain/Files/tab10/tigerweb_tab10_county_2010_ky.html">US Census </a>2010 State of Kentucky counties. The GeoJson file was created with QGIS and joining CSV file created in Excel 2007 with hemp
+          census data. The data from the 1910 Census report had blurred scanned page so four counties are missing data or incomplete data. The effected counties are Lee, Lincoin, Madison, and Magoffin. Also the County boundries have changed over the decades
+          and may not represent the boundries that existed at the time of the Census becuase 2010 boundary data used to create maps. Please visit <a href="https://publications.newberry.org/ahcbp/pages/Kentucky.html">Atlas of Historical County Boundaries</a>          for changes in County boundaries. </p>
+      </footer>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/simple-statistics@6.1.0/dist/simple-statistics.min.js"></script>
+
+    <script>
+      // create map options
+      var options = {
+        center: [37.8, -85.8], // center map on Kentucky
+        zoom: 6.4, //intial zoom to show State of Kentucky
+        zoomSnap: .1, // set coarseness of zoom
+        zoomControl: false // set zoom control to off
+      }
+      // map variable to display in grid 2x2
+      var map1850 = L.map('map1850', options);
+      var map1900 = L.map('map1900', options);
+      var map1910 = L.map('map1910', options);
+      var mapChange = L.map('mapChange', options);
+      // add global variables
+      var hemp1850 = "total_1850";
+      var hemp1900 = "total_1900";
+      var hemp1910 = "total_1910";
+      // empty array to hold all our values
+      var values1850 = [];
+      var values1900 = [];
+      var values1910 = [];
+      var valuesChange = [];
+      // create variables to get data outside getJson() method
+      $.getJSON("data/ky_hemp.geojson", function(data) { // map 1850 start
+
+        // get the 1850s breaks
+        var breaks1850 = getClassBreaks(data, hemp1850);
+        var dataHemp1850 = L.geoJson(data, { // Leaflet map load data
+          style: function(feature) {
+            return {
+              color: '#000000',
+              weight: .4,
+              // color map using that data and breaks
+              fillColor: getColor(feature.properties[hemp1850], breaks1850),
+              fillOpacity: 1
+            }
+          },
+          onEachFeature: function(feature, layer) { // add bindTooltip to each county
+            // bind tooltip info to each layer with name
+            var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
+              '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1850]; // add popup info to map
+            layer.bindTooltip(tooltip);
+          }
+        }).addTo(map1850);
+        drawLegend(map1850, breaks1850);
+
+        var breaks1900 = getClassBreaks(data, hemp1900); // create variables to generate class breaks
+        var dataHemp1900 = L.geoJson(data, { // Leaflet map load data 1900 map
+          style: function(feature) {
+            return {
+              color: '#000000',
+              weight: .4,
+              fillColor: getColor(feature.properties[hemp1900], breaks1900),
+              fillOpacity: 1
+            }
+          },
+          onEachFeature: function(feature, layer) { // add bindTooltip to each county
+            var props = layer.feature.properties;
+            // console.log(props);
+            // bind tooltip info to each layer with name
+            var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
+              '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1900] +
+              '<br> <b>Pounds: </b>' + props.lbs_1900; // add popup info to map
+            layer.bindTooltip(tooltip);
+          }
+        }).addTo(map1900); //1900 map
+        drawLegend(map1900, breaks1900);
+
+        var breaks1910 = getClassBreaks(data, hemp1910); // create variables to generate class breaks
+        var dataHemp1910 = L.geoJson(data, { // Leaflet map load data 1910 map
+          style: function(feature) {
+            return {
+              color: '#000000',
+              weight: .4,
+              fillColor: getColor(feature.properties[hemp1910], breaks1910),
+              fillOpacity: 1
+            }
+          },
+          onEachFeature: function(feature, layer) { // add bindTooltip to each county
+            var props = layer.feature.properties;
+            // bind tooltip info to each layer with name
+            var tooltip = '<b>County: </b> ' + props.NAME +
+              '<br> <b>Tonnage: </b>' + props[hemp1910] +
+              '<br> <b>Pounds: </b>' + props.lbs_1910 +
+              '<br> <b>Value: $</b>' + props.value_1910; // add popup info to map
+            layer.bindTooltip(tooltip);
+          }
+        }).addTo(map1910); //1910 map
+        drawLegend(map1910, breaks1910);
+      });
+
+      function getClassBreaks(data, dataYear) { //getClassBreaks function start
+        // create empty Array for storing values
+        var values = [];
+
+        // loop through all the counties
+        data.features.forEach(function(feature) {
+          var props = feature.properties
+          var value = props[dataYear];
+          // console.log(value);
+          values.push(+value);
+        });
+        // determine similar clusters
+        var clusters = ss.ckmeans(values, 5);
+        // create an array of the lowest value within each cluster
+        var breaks = clusters.map(function(cluster) {
+          return [cluster[0], cluster.pop()];
+        });
+        return breaks; // return Array of class breaks
+      } // end getClassBreaks function
+      function getColor(d, breaks) {
+
+        if (d <= breaks[0][1]) {
+          var color = '#f1eef6';
+        } else if (d <= breaks[1][1]) {
+          var color = '#d7b5d8';
+        } else if (d <= breaks[2][1]) {
+          var color = '#df65b0';
+        } else if (d <= breaks[3][1]) {
+          var color = '#dd1c77';
+        } else if (d <= breaks[4][1]) {
+          var color = '#980043';
+        }
+        return color;
+      } // end getColor
+      function drawLegend(targetMap, breaks) // create the Leaflet control and position
+      var targetMap = L.control(, {
         position: 'topleft'
       });
       // when it's added to the map
-      legend1850.onAdd = function() {
+      targetMap.onAdd = function() {
         // create a new DOM div element with a class name of "legend"
         var div = L.DomUtil.create('div', 'legend');
         // insert some placeholder text for now
         div.innerHTML = "<h3><b>Tons of Hemp</b></h3>";
         // return the div element
-        for (var i = 0; i < breaks1850.length; i++) {
-          var color = getColor1850(breaks1850[i][0], breaks1850);
+        for (var i = 0; i < breaks.length; i++) {
+          var color = getColor(breaks[i][0], breaks);
           div.innerHTML +=
             '<span style="background:' + color + '"></span> ' +
-            '<label> ' + (breaks1850[i][0]).toLocaleString() + ' &mdash; ' +
-            (breaks1850[i][1]).toLocaleString() + '</label>';
+            '<label> ' + (breaks[i][0]).toLocaleString() + ' &mdash; ' +
+            (breaks[i][1]).toLocaleString() + '</label>';
         }
         return div;
       }; // end legend
       // add the legend to the map
-      legend1850.addTo(map1850);
-    }
-    map1850.addControl(L.control.zoom({ // add zoom control back to map
-      position: 'topright'
-    })); //end 1850 map
-
-
-    //*************************************************
-    function draw1900(dataHemp1900) { // start draw1900 map
-      var breaks1900 = getClassBreaks1900(dataHemp1900); // create variables to generate class breaks
-      drawLegend1900(breaks1900); // legend 1900
-
-      dataHemp1900.eachLayer(function(layer) { // loop layer to set legend color
-        var props = layer.feature.properties;
-        console.log(hemp1900);
-        layer.setStyle({
-          fillColor: getColor1900(props[hemp1900],
-            breaks1900)
-        });
-      });
-    }
-
-    function getClassBreaks1900(dataHemp1900) { //getClassBreaks function start
-      // create empty Array for storing values
-      var values1900 = [];
-      // loop through all the counties for 1900 data
-      dataHemp1900.eachLayer(function(layer) {
-        var props = layer.feature.properties;
-        if (props.ky_HEMP_1900_AC != 0) {
-          var value1900 = Math.round((props.ky_HEMP_1900_LBS / props.ky_HEMP_1900_AC));
-          // console.log(value1900);
-          values1900.push(value1900);
-          // console.log(values1900);
-          return values1900;
-        }
-      });
-      // determine similar clusters
-      var clusters1900 = ss.ckmeans(values1900, 5);
-      // create an array of the lowest value within each cluster
-      var breaks1900 = clusters1900.map(function(cluster1900) {
-        return [cluster1900[0], cluster1900.pop()];
-      });
-      return breaks1900; // return Array of class breaks
-    } // end getClassBreaks function
-    function getColor1900(d, breaks1900) {
-      // console.log(breaks1900);
-      if (d <= breaks1900[0][1]) {
-        return '#f1eef6';
-      } else if (d <= breaks1900[1][1]) {
-        return '#d7b5d8';
-      } else if (d <= breaks1900[2][1]) {
-        return '#df65b0';
-      } else if (d <= breaks1900[3][1]) {
-        return '#dd1c77';
-      } else if (d <= breaks1900[4][1]) {
-        return '#980043';
+      targetMap.addTo(targetMap);
       }
-    } // end getColor
-    function drawLegend1900(breaks1900) {
-      // create the Leaflet control and position
-      var legend1900 = L.control({
-        position: 'topleft'
-      });
-      // when it's added to the map
-      legend1900.onAdd = function() {
-        // create a new DOM div element with a class name of "legend"
-        var div = L.DomUtil.create('div', 'legend');
-        // insert some placeholder text for now
-        div.innerHTML = "<h3><b>LBS/Acre</b></h3>";
-        // return the div element
-        for (var i = 0; i < breaks1900.length; i++) {
-          var color = getColor1900(breaks1900[i][0], breaks1900);
-          div.innerHTML +=
-            '<span style="background:' + color + '"></span> ' +
-            '<label> ' + (breaks1900[i][0]).toLocaleString() + ' &mdash; ' +
-            (breaks1900[i][1]).toLocaleString() + '</label>';
-        }
-        return div;
-      }; // end legend
-      // add the legend to the map
-      legend1900.addTo(map1900);
-    }
-    map1900.addControl(L.control.zoom({ // add zoom control back to map
-      position: 'topright'
-    })); //end 1900 map
-    //*************************************************
-    function draw1910(dataHemp1910) { // start draw1910 map
-      var breaks1910 = getClassBreaks1910(dataHemp1910); // create variables to generate class breaks
-      drawLegend1910(breaks1910); // legend 1910
-      dataHemp1910.eachLayer(function(layer) { // loop layer to set legend color
-        var props = layer.feature.properties;
-        layer.setStyle({
-          fillColor: getColor1910(props[hemp1910],
-            breaks1910)
-        });
-      });
-    }
-
-    function getClassBreaks1910(dataHemp1910) { //getClassBreaks function start
-      // create empty Array for storing values
-      var values1910 = [];
-      // loop through all the counties for 1910 data
-      dataHemp1910.eachLayer(function(layer) {
-        var props = layer.feature.properties;
-        console.log(props);
-        if (props.ky_HEMP_1910_AC != 0) {
-          var value1910 = Math.round((props.ky_HEMP_1910_LBS / props.ky_HEMP_1910_AC));
-          values1910.push(value1910);
-        }
-      });
-      // determine similar clusters
-      var clusters1910 = ss.ckmeans(values1910, 5);
-      // create an array of the lowest value within each cluster
-      var breaks1910 = clusters1910.map(function(cluster1910) {
-        return [cluster1910[0], cluster1910.pop()];
-      });
-      return breaks1910; // return Array of class breaks
-    } // end getClassBreaks function
-    function getColor1910(d, breaks1910) {
-      // console.log(breaks1910);
-      if (d <= breaks1910[0][1]) {
-        return '#f1eef6';
-      } else if (d <= breaks1910[1][1]) {
-        return '#d7b5d8';
-      } else if (d <= breaks1910[2][1]) {
-        return '#df65b0';
-      } else if (d <= breaks1910[3][1]) {
-        return '#dd1c77';
-      } else if (d <= breaks1910[4][1]) {
-        return '#980043';
-      }
-    } // end getColor
-    function drawLegend1910(breaks1910) {
-      // create the Leaflet control and position
-      var legend1910 = L.control({
-        position: 'topleft'
-      });
-      // when it's added to the map
-      legend1910.onAdd = function() {
-        // create a new DOM div element with a class name of "legend"
-        var div = L.DomUtil.create('div', 'legend');
-        // insert some placeholder text for now
-        div.innerHTML = "<h3><b>LBS/Acre</b></h3>";
-        // return the div element
-        for (var i = 0; i < breaks1910.length; i++) {
-          var color = getColor1910(breaks1910[i][0], breaks1910);
-          div.innerHTML +=
-            '<span style="background:' + color + '"></span> ' +
-            '<label> ' + (breaks1910[i][0]).toLocaleString() + ' &mdash; ' +
-            (breaks1910[i][1]).toLocaleString() + '</label>';
-        }
-        return div;
-      }; // end legend
-      // add the legend to the map
-      legend1910.addTo(map1910);
-    }
-    map1910.addControl(L.control.zoom({ // add zoom control back to map
-      position: 'topright'
-    })); //end 1910 map
-  </script>
-
-</body>
+      // function drawLegend1850(breaks1850) {
+      //   // create the Leaflet control and position
+      //   var legend1850 = L.control({
+      //     position: 'topleft'
+      //   });
+      //   // when it's added to the map
+      //   legend1850.onAdd = function() {
+      //     // create a new DOM div element with a class name of "legend"
+      //     var div = L.DomUtil.create('div', 'legend');
+      //     // insert some placeholder text for now
+      //     div.innerHTML = "<h3><b>Tons of Hemp</b></h3>";
+      //     // return the div element
+      //     for (var i = 0; i < breaks1850.length; i++) {
+      //       var color = getColor1850(breaks1850[i][0], breaks1850);
+      //       div.innerHTML +=
+      //         '<span style="background:' + color + '"></span> ' +
+      //         '<label> ' + (breaks1850[i][0]).toLocaleString() + ' &mdash; ' +
+      //         (breaks1850[i][1]).toLocaleString() + '</label>';
+      //     }
+      //     return div;
+      //   }; // end legend
+      //   // add the legend to the map
+      //   legend1850.addTo(map1850);
+      // }
+      // function drawLegend1910(breaks1910) {
+      //   // create the Leaflet control and position
+      //   var legend1910 = L.control({
+      //     position: 'topleft'
+      //   });
+      //   // when it's added to the map
+      //   legend1910.onAdd = function() {
+      //     // create a new DOM div element with a class name of "legend"
+      //     var div = L.DomUtil.create('div', 'legend');
+      //     // insert some placeholder text for now
+      //     div.innerHTML = "<h3><b>LBS/Acre</b></h3>";
+      //     // return the div element
+      //     for (var i = 0; i < breaks1910.length; i++) {
+      //       var color = getColor1910(breaks1910[i][0], breaks1910);
+      //       div.innerHTML +=
+      //         '<span style="background:' + color + '"></span> ' +
+      //         '<label> ' + (breaks1910[i][0]).toLocaleString() + ' &mdash; ' +
+      //         (breaks1910[i][1]).toLocaleString() + '</label>';
+      //     }
+      //     return div;
+      //   }; // end legend
+      //   // add the legend to the map
+      //   legend1910.addTo(map1910);
+      // }
+      map1850.addControl(L.control.zoom({ // add zoom control back to map
+        position: 'topright'
+      })); //end 1850 map
+      map1900.addControl(L.control.zoom({ // add zoom control back to map
+        position: 'topright'
+      })); //end 1900 map
+      map1910.addControl(L.control.zoom({ // add zoom control back to map
+        position: 'topright'
+      })); //end 1910 map
+    </script>
+  </body>
 
 </html>
