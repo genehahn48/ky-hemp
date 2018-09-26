@@ -54,7 +54,16 @@
       text-align: center;
     }
 
-    footer {}
+    h4 {
+      color: black;
+      font-size: 1.1em;
+      text-align: center;
+    }
+
+    footer {
+      color: black;
+      font-size: .8em;
+    }
 
     /* Create two equal columns that floats next to each other */
 
@@ -69,7 +78,7 @@
     .column {
       float: left;
       width: 48%;
-      /* padding: 10px; */
+
     }
 
     .col-left {
@@ -85,36 +94,28 @@
     }
 
     #map1850 {
-      /* width: 45%; */
       height: 250px;
-      /* margin: 5px 5%; */
-      /* background: #D1E6CB; */
-      border: 2px solid #D1E6CB;
+      background: #bbd1b5;
+      border: 1px solid #FE0101;
       opacity: 1;
     }
 
     #map1900 {
-      /* width: 45%; */
       height: 250px;
-      /* margin: 5px 5%; */
-      /* border: 1px solid #FE0101; */
-      /* background-color: #618A19; */
+      border: 1px solid #FE0101;
+      background-color: #bbd1b5;
     }
 
     #map1910 {
-      /* width: 45%; */
       height: 250px;
-      /* margin: 5px 5%; */
-      /* border: 1px solid #FE0101; */
-      /* background-color: #618A19; */
+      border: 1px solid #FE0101;
+      background-color: #bbd1b5;
     }
 
     #mapChange {
-      /* width: 45%; */
       height: 250px;
-      /* margin: 5px 5%; */
-      /* border: 1px solid #FE0101; */
-      /* background-color: #618A19; */
+      background-color: #bbd1b5;
+      border: 1px solid #FE0101;
     }
 
     .legend {
@@ -161,21 +162,21 @@
     <div class="row">
       <div class="column col-left">
         <div id='map1850'>
-          <h3>1850's Census</h3>
+          <h4>1850's Census</h4>
         </div>
       </div>
       <div class="column">
         <div id='map1900'>
-          <h3>1900's Census</h3>
+          <h4>1900's Census</h4>
         </div>
       </div>
     </div>
     <div class="row">
       <div class="column col-left" id='map1910'>
-        <h3>1910's Census</h3>
+        <h4>1910's Census</h4>
       </div>
       <div class="column" id='mapChange'>
-        <h3>60 yrs change</h3>
+        <h4>60 yrs change</h4>
       </div>
     </div>
   </section>
@@ -236,13 +237,13 @@
         onEachFeature: function(feature, layer) { // add bindTooltip to each county
           // bind tooltip info to each layer with name
           var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
-            '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1850]; // add popup info to map
+            '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1850].toLocaleString(); // add popup info to map
           layer.bindTooltip(tooltip);
         }
       }).addTo(map1850);
       drawLegend(map1850, breaks);
 
-      var breaks = getClassBreaks(data, hemp1900); // create variables to generate class breaks
+      // var breaks = getClassBreaks(data, hemp1900); // create variables to generate class breaks
       var dataHemp1900 = L.geoJson(data, { // Leaflet map load data 1900 map
         style: function(feature) {
           return {
@@ -257,14 +258,14 @@
           // console.log(props);
           // bind tooltip info to each layer with name
           var tooltip = '<b>County: </b> ' + layer.feature.properties.NAME +
-            '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1900] +
-            '<br> <b>Pounds: </b>' + props.lbs_1900; // add popup info to map
+            '<br> <b>Tonnage: </b>' + layer.feature.properties[hemp1900].toLocaleString() +
+            '<br> <b>Pounds: </b>' + props.lbs_1900.toLocaleString(); // add popup info to map
           layer.bindTooltip(tooltip);
         }
       }).addTo(map1900); //1900 map
       drawLegend(map1900, breaks);
 
-      var breaks = getClassBreaks(data, hemp1910); // create variables to generate class breaks
+      // var breaks = getClassBreaks(data, hemp1910); // create variables to generate class breaks
       var dataHemp1910 = L.geoJson(data, { // Leaflet map load data 1910 map
         style: function(feature) {
           return {
@@ -278,20 +279,41 @@
           var props = layer.feature.properties;
           // bind tooltip info to each layer with name
           var tooltip = '<b>County: </b> ' + props.NAME +
-            '<br> <b>Tonnage: </b>' + props[hemp1910] +
-            '<br> <b>Pounds: </b>' + props.lbs_1910 +
-            '<br> <b>Value: $</b>' + props.value_1910; // add popup info to map
+            '<br> <b>Tonnage: </b>' + props[hemp1910].toLocaleString() +
+            '<br> <b>Pounds: </b>' + props.lbs_1910.toLocaleString() +
+            '<br> <b>Value: $</b>' + props.value_1910.toLocaleString(); // add popup info to map
           layer.bindTooltip(tooltip);
         }
       }).addTo(map1910); //1910 map
       drawLegend(map1910, breaks);
+
+      var breaks = getClassBreaks(data, hemp1910); // create variables to generate class breaks
+      var dataHempchange = L.geoJson(data, { // Leaflet map load data 1910 map
+        style: function(feature) {
+          return {
+            color: '#000000',
+            weight: .4,
+            fillColor: getColor(feature.properties[hemp1910], breaks),
+            fillOpacity: 1
+          }
+        },
+        onEachFeature: function(feature, layer) { // add bindTooltip to each county
+          var props = layer.feature.properties;
+          // bind tooltip info to each layer with name
+          var tooltip = '<b>County: </b> ' + props.NAME +
+            '<br> <b>Tonnage: </b>' + props[hemp1910].toLocaleString() +
+            '<br> <b>Pounds: </b>' + props.lbs_1910.toLocaleString() +
+            '<br> <b>Value: $</b>' + props.value_1910.toLocaleString(); // add popup info to map
+          layer.bindTooltip(tooltip);
+        }
+      }).addTo(mapChange); //1910 map
+      drawLegend(mapChange, breaks);
     });
 
     // functions for data display
     function getClassBreaks(data, dataYear) { //getClassBreaks function start
       // create empty Array for storing values
       var values = [];
-
       // loop through all the counties
       data.features.forEach(function(feature) {
         var props = feature.properties
@@ -308,6 +330,7 @@
       return breaks; // return Array of class breaks
     } // end getClassBreaks function
     function getColor(d, breaks) {
+      //console.log(breaks);
       if (d <= breaks[0][1]) {
         var color = '#f1eef6';
       } else if (d <= breaks[1][1]) {
@@ -318,7 +341,9 @@
         var color = '#dd1c77';
       } else if (d <= breaks[4][1]) {
         var color = '#980043';
-      }
+      } //else if (d === 0) {
+      //var color = 'gray';
+      //}
       return color;
     } // end getColor
 
@@ -344,7 +369,17 @@
       }; // end legend
       // add the legend to the map
       legend.addTo(targetMap);
+
     };
+    map1850.addControl(L.control.zoom({ // add zoom control back to map
+      position: 'topright'
+    })); //end 1850 map
+    map1900.addControl(L.control.zoom({ // add zoom control back to map
+      position: 'topright'
+    })); //end 1900 map
+    map1910.addControl(L.control.zoom({ // add zoom control back to map
+      position: 'topright'
+    })); //end 1910 map
   </script>
 </body>
 
