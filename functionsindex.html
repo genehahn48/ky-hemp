@@ -221,15 +221,16 @@
     var valuesChange = [];
     // create variables to get data outside getJson() method
     $.getJSON("data/ky_hemp.geojson", function(data) { // map 1850 start
+
       // get the 1850s breaks
-      var breaks = getClassBreaks(data, hemp1850);
+      var breaks1850 = getClassBreaks(data, hemp1850);
       var dataHemp1850 = L.geoJson(data, { // Leaflet map load data
         style: function(feature) {
           return {
             color: '#000000',
             weight: .4,
             // color map using that data and breaks
-            fillColor: getColor(feature.properties[hemp1850], breaks),
+            fillColor: getColor(feature.properties[hemp1850], breaks1850),
             fillOpacity: 1
           }
         },
@@ -240,15 +241,15 @@
           layer.bindTooltip(tooltip);
         }
       }).addTo(map1850);
-      drawLegend(map1850, breaks);
+      drawLegend(hemp1850, breaks1850);
 
-      var breaks = getClassBreaks(data, hemp1900); // create variables to generate class breaks
+      var breaks1900 = getClassBreaks(data, hemp1900); // create variables to generate class breaks
       var dataHemp1900 = L.geoJson(data, { // Leaflet map load data 1900 map
         style: function(feature) {
           return {
             color: '#000000',
             weight: .4,
-            fillColor: getColor(feature.properties[hemp1900], breaks),
+            fillColor: getColor(feature.properties[hemp1900], breaks1900),
             fillOpacity: 1
           }
         },
@@ -262,15 +263,15 @@
           layer.bindTooltip(tooltip);
         }
       }).addTo(map1900); //1900 map
-      drawLegend(map1900, breaks);
+      drawLegend(map1900, breaks1900);
 
-      var breaks = getClassBreaks(data, hemp1910); // create variables to generate class breaks
+      var breaks1910 = getClassBreaks(data, hemp1910); // create variables to generate class breaks
       var dataHemp1910 = L.geoJson(data, { // Leaflet map load data 1910 map
         style: function(feature) {
           return {
             color: '#000000',
             weight: .4,
-            fillColor: getColor(feature.properties[hemp1910], breaks),
+            fillColor: getColor(feature.properties[hemp1910], breaks1910),
             fillOpacity: 1
           }
         },
@@ -284,10 +285,9 @@
           layer.bindTooltip(tooltip);
         }
       }).addTo(map1910); //1910 map
-      drawLegend(map1910, breaks);
+      drawLegend(map1910, breaks1910);
     });
 
-    // functions for data display
     function getClassBreaks(data, dataYear) { //getClassBreaks function start
       // create empty Array for storing values
       var values = [];
@@ -323,11 +323,11 @@
     } // end getColor
 
     function drawLegend(targetMap, breaks) { // create the Leaflet control and position
-      var legend = L.control({
+      var targetMap = L.control({
         position: 'topleft'
       });
       // when it's added to the map
-      legend.onAdd = function() {
+      targetMap.onAdd = function() {
         // create a new DOM div element with a class name of "legend"
         var div = L.DomUtil.create('div', 'legend');
         // insert some placeholder text for now
@@ -343,8 +343,19 @@
         return div;
       }; // end legend
       // add the legend to the map
-      legend.addTo(targetMap);
-    };
+      targetMap.addTo(targetMap);
+    }
+
+
+    map1850.addControl(L.control.zoom({ // add zoom control back to map
+      position: 'topright'
+    })); //end 1850 map
+    map1900.addControl(L.control.zoom({ // add zoom control back to map
+      position: 'topright'
+    })); //end 1900 map
+    map1910.addControl(L.control.zoom({ // add zoom control back to map
+      position: 'topright'
+    })); //end 1910 map
   </script>
 </body>
 
