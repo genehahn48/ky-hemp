@@ -220,6 +220,7 @@
     var hemp1850 = "total_1850";
     var hemp1900 = "total_1900";
     var hemp1910 = "total_1910";
+    var hempChange = "percent_Change"
     // empty array to hold all our values
     var values1850 = [];
     var values1900 = [];
@@ -323,36 +324,75 @@
 
 
       //  START mapChange
-      var hempChange = [];
-      console.log(data);
-      // var breaks = getClassBreaks(data, hemp1910); // create variables to generate class breaks
+      //var hempChange = [];
+      // var hempChange = percentChange(data); // create variables to generate percent of change
+      //console.log(hempChange);
+      var breaksChange = getClassBreakschange(data, hempChange); // create variables to generate class breaks
       var dataHempchange = L.geoJson(data, { // Leaflet map load data 1910 map
         style: function(feature) {
-          //console.log(feature.properties.total_1850);
-
-          return {
-            color: '#000000',
-            weight: .4,
-            fillColor: getColor(feature.properties[hemp1910], breaks),
-            fillOpacity: 1
+          if (feature.properties.percent_Change == null) {
+            //console.log(feature.properties.percent_Change);
+            return {
+              color: '#000000',
+              weight: .4,
+              fillColor: '#bbd1b5',
+              fillOpacity: 1
+            };
+          } else {
+            return {
+              color: '#000000',
+              weight: .4,
+              fillColor: getColorchange(feature.properties.percent_Change, breaksChange),
+              fillOpacity: 1
+            }
           }
-
         },
+
         onEachFeature: function(feature, layer) { // add bindTooltip to each county
           var props = layer.feature.properties;
           // bind tooltip info to each layer with name
           var tooltip = '<b>County: </b> ' + props.NAME +
-            '<br> <b>Tonnage: </b>' + props[hemp1910].toLocaleString() +
-            '<br> <b>Pounds: </b>' + props.lbs_1910.toLocaleString() +
-            '<br> <b>Value: $</b>' + props.value_1910.toLocaleString(); // add popup info to map
+            '<br> <b>Percent: </b>' + props[hempChange]
+          // '<br> <b>Pounds: </b>' + props.lbs_1910.toLocaleString() +
+          // '<br> <b>Value: $</b>' + props.value_1910.toLocaleString(); // add popup info to map
           layer.bindTooltip(tooltip);
         }
       }).addTo(mapChange); //1910 map
-      drawLegend(mapChange, breaks);
-      //console.log(dataHempchange._layers[779]);
+      drawLegendchange(mapChange, breaksChange);
     });
 
     // functions for data display
+    // percent change
+    // function percentChange(data, hempChange) {
+    //   // create empty Array for storing values
+    //   var values = [];
+    //   // loop through all the counties
+    //   data.features.forEach(function(feature) {
+    //     var props = feature.properties
+    //     var value = [];
+    //     // console.log(props);
+    //     if (props.total_1850 == 0) {
+    //       return 0
+    //     } else {
+    //       value = ((props.total_1910 - props.total_1850) / props.total_1850) * 100;
+    //       //console.log(value);
+    //       var v = value.toFixed(1);
+    //       //console.log(v);
+    //       values.push(+v);
+    //       console.log(values);
+    //       return values;
+    //     }
+    //   }); // determine similar clusters
+    //   console.log(values);
+    //   var clusters = ss.equalIntervalBreaks(values, 5);
+    //   console.log(clusters);
+    //   // create an array of the lowest value within each cluster
+    //   var breaks = clusters.map(function(cluster) {
+    //     return [cluster[0], cluster.pop()];
+    //   });
+    //   return breaks; // return Array of class breaks
+    //} // end percent change
+
     //getClassBreaks function START
     function getClassBreaks(data, dataYear) {
       // create empty Array for storing values
@@ -372,6 +412,30 @@
       });
       return breaks; // return Array of class breaks
     } // END getClassBreaks function.
+    function getClassBreakschange(data, percent) {
+      // create empty Array for storing values
+      var values = [];
+      // loop through all the counties
+      data.features.forEach(function(feature) {
+        var props = feature.properties
+        var value = props[percent];
+
+        if (props.percent !== "null") {
+          values.push(+value);
+          // console.log(values);
+        }
+      });
+      // determine similar clusters
+      //var clusters = ss.ckmeans(values, 5);
+      var clusters = [-100, -92, -73, -45, 69, 666.2];
+
+      console.log(clusters); // create an array of the lowest value within each cluster
+      var breaks = clusters.map(function(cluster) {
+        return [cluster];
+      });
+      return breaks; // return Array of class breaks
+    } // END getClassBreaks function.
+
     function getColor(d, breaks) {
       //console.log(breaks);
       if (d <= breaks[0][1]) {
@@ -389,6 +453,23 @@
     } // end getColor
     // getColor function END
 
+    function getColorchange(d, breaks) {
+      // console.log(d);
+
+      if (d <= -100) {
+        var color = '#f1eef6';
+      } else if (d <= -92) {
+        var color = '#d7b5d8';
+      } else if (d <= -73) {
+        var color = '#df65b0';
+      } else if (d <= 0) {
+        var color = '#dd1c77';
+      } else if (d >= 69) {
+        var color = '#980043';
+      }
+      return color;
+    } // end getColor
+    // getColor function END
 
 
     // drawLegend function START
@@ -417,7 +498,32 @@
       legend.addTo(targetMap);
     };
     // drawLegend function END
+    // drawLegend function START
+    function drawLegendchange(targetMap, breaks) { // create the Leaflet control and position
+      var legend = L.control({
+        position: 'topleft'
+      });
+      // Legend box style add to map
+      legend.onAdd = function() {
+        // create a new DOM div element with a class name of "legend"
+        var div = L.DomUtil.create('div', 'legend');
+        // insert some placeholder text for now
+        div.innerHTML = "<h3><b>Percentage</b></h3>";
+        // return the div element
+        for (var i = 0; i < breaks.length - 1; i++) {
+          var color = getColorchange(breaks[i][0], breaks);
+          div.innerHTML +=
+            '<span style="background:' + color + '"></span> ' +
+            '<label> ' + (breaks[i]) + ' &mdash; ' +
+            (breaks[i]) + '</label>';
+        }
+        return div;
+      }; // end legend box styling
 
+      // add the legend to the map
+      legend.addTo(targetMap);
+    };
+    // drawLegend function END
     // add map zoom control to topright map
     map1850.addControl(L.control.zoom({ // add zoom control back to map
       position: 'topright'
