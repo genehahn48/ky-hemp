@@ -328,10 +328,10 @@
       // var hempChange = percentChange(data); // create variables to generate percent of change
       //console.log(hempChange);
       var breaksChange = getClassBreakschange(data, hempChange); // create variables to generate class breaks
+      //console.log(hempChange);
       var dataHempchange = L.geoJson(data, { // Leaflet map load data 1910 map
         style: function(feature) {
           if (feature.properties.percent_Change == null) {
-            //console.log(feature.properties.percent_Change);
             return {
               color: '#000000',
               weight: .4,
@@ -358,6 +358,7 @@
           layer.bindTooltip(tooltip);
         }
       }).addTo(mapChange); //1910 map
+      //console.log(breaksChange);
       drawLegendchange(mapChange, breaksChange);
     });
 
@@ -401,7 +402,6 @@
       data.features.forEach(function(feature) {
         var props = feature.properties
         var value = props[dataYear];
-        // console.log(value);
         values.push(+value);
       });
       // determine similar clusters
@@ -412,6 +412,7 @@
       });
       return breaks; // return Array of class breaks
     } // END getClassBreaks function.
+
     function getClassBreakschange(data, percent) {
       // create empty Array for storing values
       var values = [];
@@ -422,22 +423,30 @@
 
         if (props.percent !== "null") {
           values.push(+value);
-          // console.log(values);
         }
+        // console.log(values.sort(function(a, b) {
+        //   return a - b
+        // }));
+
       });
       // determine similar clusters
-      //var clusters = ss.ckmeans(values, 5);
-      var clusters = [-100, -92, -73, -45, 69, 666.2];
+      var clusters = [
+        [-100, -100],
+        [-99.9, -92],
+        [-91.9, -74],
+        [-72.9, -45],
+        [-44.9, 666.2]
+      ];
+      // create an array of the lowest value within each cluster
+      var breaks = clusters;
+      var cluster = clusters;
+      // console.log(breaks[4][1]);
+      // return [cluster];
 
-      console.log(clusters); // create an array of the lowest value within each cluster
-      var breaks = clusters.map(function(cluster) {
-        return [cluster];
-      });
       return breaks; // return Array of class breaks
     } // END getClassBreaks function.
 
     function getColor(d, breaks) {
-      //console.log(breaks);
       if (d <= breaks[0][1]) {
         var color = '#f1eef6';
       } else if (d <= breaks[1][1]) {
@@ -454,17 +463,16 @@
     // getColor function END
 
     function getColorchange(d, breaks) {
-      // console.log(d);
-
-      if (d <= -100) {
+      //console.log(breaks[1][1]);
+      if (d <= breaks[0][1]) {
         var color = '#f1eef6';
-      } else if (d <= -92) {
+      } else if (d <= breaks[1][0]) {
         var color = '#d7b5d8';
-      } else if (d <= -73) {
+      } else if (d <= breaks[2][1]) {
         var color = '#df65b0';
-      } else if (d <= 0) {
+      } else if (d <= breaks[3][1]) {
         var color = '#dd1c77';
-      } else if (d >= 69) {
+      } else if (d >= breaks[4][0]) {
         var color = '#980043';
       }
       return color;
@@ -508,14 +516,14 @@
         // create a new DOM div element with a class name of "legend"
         var div = L.DomUtil.create('div', 'legend');
         // insert some placeholder text for now
-        div.innerHTML = "<h3><b>Percentage</b></h3>";
+        div.innerHTML = "<h3><b>Percent Change</b></h3>";
         // return the div element
-        for (var i = 0; i < breaks.length - 1; i++) {
-          var color = getColorchange(breaks[i][0], breaks);
+        for (var i = 0; i < breaks.length; i++) {
+          var color = getColor(breaks[i][1], breaks);
           div.innerHTML +=
             '<span style="background:' + color + '"></span> ' +
-            '<label> ' + (breaks[i]) + ' &mdash; ' +
-            (breaks[i]) + '</label>';
+            '<label> ' + (breaks[i][0]) + ' &mdash; ' +
+            (breaks[i][1]) + '</label>';
         }
         return div;
       }; // end legend box styling
