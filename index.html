@@ -233,6 +233,8 @@
       var breaks = getClassBreaks(data, hemp1850); // get the 1850s breaks
       var dataHemp1850 = L.geoJson(data, { // Leaflet map load data
         style: function(feature) {
+          //console.log(feature.properties[hemp1850]);
+          //var total = ss.sumsimple(feature.properties[hemp1850])
           if (feature.properties.total_1850 === 0) {
             return {
               color: '#000000',
@@ -405,6 +407,8 @@
         values.push(+value);
       });
       // determine similar clusters
+      var total = ss.sum(values);
+      console.log(total);
       var clusters = ss.ckmeans(values, 5);
       // create an array of the lowest value within each cluster
       var breaks = clusters.map(function(cluster) {
