@@ -235,7 +235,7 @@
         style: function(feature) {
           //console.log(feature.properties[hemp1850]);
           //var total = ss.sumsimple(feature.properties[hemp1850])
-          if (feature.properties.total_1850 === 0) {
+          if (feature.properties[hemp1850] === 0) {
             return {
               color: '#000000',
               weight: .4,
@@ -264,7 +264,7 @@
       var breaks1900 = getClassBreaks(data, hemp1900); // create variables to generate class breaks
       var dataHemp1900 = L.geoJson(data, { // Leaflet map load data 1900 map
         style: function(feature) {
-          if (feature.properties.total_1900 === 0) {
+          if (feature.properties[hemp1900] === 0) {
             return {
               color: '#000000',
               weight: .4,
@@ -296,7 +296,7 @@
       var breaks1910 = getClassBreaks(data, hemp1910); // create variables to generate class breaks
       var dataHemp1910 = L.geoJson(data, { // Leaflet map load data 1910 map
         style: function(feature) {
-          if (feature.properties.total_1910 === 0) {
+          if (feature.properties[hemp1910] === 0) {
             return {
               color: '#000000',
               weight: .4,
@@ -396,6 +396,7 @@
     //   return breaks; // return Array of class breaks
     //} // end percent change
 
+
     //getClassBreaks function START
     function getClassBreaks(data, dataYear) {
       // create empty Array for storing values
@@ -407,7 +408,9 @@
         values.push(+value);
       });
       // determine similar clusters
-      var total = ss.sum(values);
+      // var total = ss.sum(values);
+      // console.log(total);
+      var total = getTotal(data, dataYear, total);
       console.log(total);
       var clusters = ss.ckmeans(values, 5);
       // create an array of the lowest value within each cluster
@@ -416,6 +419,21 @@
       });
       return breaks; // return Array of class breaks
     } // END getClassBreaks function.
+
+    function getTotal(data, dataYear) {
+      // create empty Array for storing values
+      var values = [];
+      // loop through all the counties
+      data.features.forEach(function(feature) {
+        var props = feature.properties
+        var value = props[dataYear];
+        values.push(+value);
+      });
+      // determine similar clusters
+      var total = ss.sum(values);
+      console.log(total);
+      return total;
+    }
 
     function getClassBreakschange(data, percent) {
       // create empty Array for storing values
@@ -549,6 +567,7 @@
     mapChange.addControl(L.control.zoom({ // add zoom control back to map
       position: 'topright'
     }));
+    console.log(values1910);
   </script>
 </body>
 
